@@ -28,7 +28,7 @@ jobs:
             echo "Regexps of plugins to export:"
             echo "$regexps"
   
-            echo "regexps=\"$regexps\"" >> $GITHUB_OUTPUT
+            echo "regexps=\"$(echo $regexps | tr '\n' ' ')\"" >> $GITHUB_OUTPUT
 
   update:
     name: Update
