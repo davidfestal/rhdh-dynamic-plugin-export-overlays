@@ -24,7 +24,7 @@ jobs:
         id: read-regexps
         shell: bash
         run: |
-            regexps="$(cat plugins-regexps)""
+            regexps="$(cat plugins-regexps)"
             echo "Regexps of plugins to export:"
             echo "$regexps"
   
