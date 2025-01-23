@@ -1,0 +1,5 @@
+@backstage-community\/
+@red-hat-developer-hub\/
+@backstage\/plugin-catalog-backend-module
+@backstage\/plugin-kubernetes
+@backstage\/plugin-techdocs$
