@@ -6,7 +6,11 @@ on:
         type: boolean
         required: false
         default: false        
-  
+      regexps:
+        type: string
+        required: false
+        default: ""        
+    
 #  schedule:
 #    - cron: '0 12 * * *'    
 
@@ -29,10 +33,13 @@ jobs:
         id: read-regexps
         shell: bash
         run: |
-            regexps="$(cat plugins-regexps)"
+            regexps="${{ inputs.regexps }}"
+            if [["${regexps}" == "" ]]
+            then
+              regexps="$(cat plugins-regexps)"
+            fi
             echo "Regexps of plugins to export:"
             echo "$regexps"
-  
             echo "regexps=$(echo $regexps | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
   update:
