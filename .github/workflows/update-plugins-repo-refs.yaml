@@ -1,6 +1,11 @@
 name: Update plugins repository references
 on:
   workflow_dispatch:
+    inputs:
+      verbose:
+        type: boolean
+        required: false
+        default: false        
   
 #  schedule:
 #    - cron: '0 12 * * *'    
@@ -38,4 +43,5 @@ jobs:
       regexps: ${{ needs.prepare.outputs.regexps }}
       overlay-repo: ${{ github.repository }}      
       release-branch-prefix: release-
+      verbose: ${{ inputs.verbose }}
 
