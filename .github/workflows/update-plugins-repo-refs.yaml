@@ -14,14 +14,6 @@ on:
         type: boolean
         required: false
         default: false
-      util-repo:
-        type: string
-        required: false
-        default: davidfestal/rhdh-plugin-export-utils
-      util-repo-ref:
-        type: string
-        required: false
-        default: multi-plugins-repo
   
 #  schedule:
 #    - cron: '0 12 * * *'    
