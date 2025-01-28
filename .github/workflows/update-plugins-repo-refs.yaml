@@ -57,7 +57,7 @@ jobs:
   update:
     name: Update
     needs: prepare
-    uses: ${{ inputs.utils-repo }}/.github/workflows/update-plugins-repo-refs.yaml@{{ utils-repo-ref }}
+    uses: davidfestal/rhdh-plugin-export-utils/.github/workflows/update-plugins-repo-refs.yaml@multi-plugins-repo
     with:
       regexps: ${{ needs.prepare.outputs.regexps }}
       overlay-repo: ${{ github.repository }}      
