@@ -58,3 +58,5 @@ jobs:
       debug: ${{ inputs.debug }}
     permissions:
       contents: write
+      pull-requests: write
+
