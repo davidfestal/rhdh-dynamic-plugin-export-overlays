@@ -56,4 +56,5 @@ jobs:
       release-branch-prefix: release-
       verbose: ${{ inputs.verbose }}
       debug: ${{ inputs.debug }}
-
+    permissions:
+      contents: write
