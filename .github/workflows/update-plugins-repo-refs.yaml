@@ -38,7 +38,7 @@ jobs:
         shell: bash
         run: |
             regexps="${{ inputs.regexps }}"
-            if [["${regexps}" == "" ]]
+            if [[ "${regexps}" == "" ]]
             then
               regexps="$(cat plugins-regexps)"
             fi
