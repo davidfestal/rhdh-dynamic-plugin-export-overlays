@@ -8,7 +8,7 @@ on:
 permissions:
     pull-requests: read
     checks: write
-    
+
 jobs:
   create:
     runs-on: ubuntu-latest
@@ -36,6 +36,7 @@ jobs:
               status: "in_progress",
               output: {
                 title: "Workflow Triggered",
+                summary: "The workflow has been triggered"
               }
             });
 
@@ -59,6 +60,6 @@ jobs:
               conclusion: "${{ github.event.workflow_run.conclusion }}",
               output: {
                 title: "Workflow Completed",
-                summary: `Finished with: ${conclusion}`
+                summary: `The workflow has finished with: ${conclusion}`
               }
             });
