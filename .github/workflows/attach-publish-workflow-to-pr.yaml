@@ -1,0 +1,60 @@
+name: Attach Publish workflow to PR
+
+on:
+  workflow_run:
+    workflows: ["Publish PR Dynamic Plugins as Images"]
+    types: [requested, completed]
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create PR Check (Pending)
+        if: github.event.action == 'requested'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            branchPRs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`
+            });
+
+            if (branchPRs.length === 0) {
+              return;
+            }
+
+            const response = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: "Publish PR Dynamic Plugins as Images",
+              head_sha: "${{ github.event.workflow_run.head_sha }}",
+              status: "in_progress",
+              output: {
+                title: "Workflow Triggered",
+              }
+            });
+
+            core.setOutput("check-id", response.data.id);
+
+  update:
+    needs: create
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Update PR Check (Completed)
+        if: needs.create.outputs.check-id && github.event.action == 'completed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: "${{ needs.create.outputs.check-id }}",
+              status: "completed",
+              conclusion: "${{ github.event.workflow_run.conclusion }}",
+              output: {
+                title: "Workflow Completed",
+                summary: `Finished with: ${conclusion}`
+              }
+            });
