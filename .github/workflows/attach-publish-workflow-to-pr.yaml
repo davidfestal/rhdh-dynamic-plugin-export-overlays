@@ -5,6 +5,10 @@ on:
     workflows: ["Publish PR Dynamic Plugins as Images"]
     types: [requested, completed]
 
+permissions:
+    pull-requests: read
+    checks: write
+    
 jobs:
   create:
     runs-on: ubuntu-latest
