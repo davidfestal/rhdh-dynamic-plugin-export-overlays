@@ -1,4 +1,4 @@
-name: Export Workspace as Dynamic Plugins Packages
+name: Publish Dynamic Plugins Packages
 on:
   issue_comment:
     types: [created]
