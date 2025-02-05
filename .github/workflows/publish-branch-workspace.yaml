@@ -1,0 +1,111 @@
+name: Export Workspace as Dynamic Plugins Packages
+on:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    name: Prepare
+
+    if: github.event.issue.pull_request
+    outputs:
+      overlay-branch: ${{ steps.get-branch.outputs.overlay-branch }}
+      workspace: ${{ steps.get-branch.outputs.workspace }}
+
+    steps:
+      - name: Get PR branch data
+        id: get-branch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if ('${{ github.event.comment.body }}' !== '/publish') {
+              return;
+            }
+            const currentPullRequest = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            const prBranch = pr.data.head.ref;
+            core.setOutput('overlay-branch', prBranch);
+            const matches = prBranch.match(/^workspaces\/release-.+__(.+)$/);
+            if (matches && matches.length == 2) {
+              core.setOutput('workspace', `workspaces/${matches[1]}`);
+              return;
+            }
+            const prFiles = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            const workspaces = [ ... new Set(prFiles.data
+              .map(f => f.filename.match(/^workspaces\/([^\/]+)\/.*/))
+              .filter(match => match)
+              .map(match => match[1])
+            )];
+            if (workspaces.length === 1) {
+              core.setOutput('workspace', `workspaces/${workspaces[0]}`);
+            } else {
+              core.setOutput('workspace', '');
+            }
+
+  parent_export:
+    needs:
+      - prepare
+
+    if: needs.prepare.outputs.overlay-branch != '' && needs.prepare.outputs.workspace != ''
+
+    uses: davidfestal/rhdh-plugin-export-utils/.github/workflows/export-workspaces-as-dynamic.yaml@multi-plugins-repo
+    with:
+      overlay-branch: ${{ needs.prepare.outputs.overlay-branch }}
+      workspace-path: ${{ needs.prepare.outputs.workspace }}
+      publish-container: true
+
+    permissions:
+      contents: write
+      attestations: write
+      packages: write
+      id-token: write
+
+  add_success_comment:
+    needs:
+      - parent_export
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add success comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = 'Publish action produced the following container images:\n${{ needs.parent_export.outputs.published-container-images }}';
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })       
+      
+  add_error_comment:
+    needs:
+      - prepare
+
+    if: always() && needs.prepare.outputs.overlay-branch != '' && needs.prepare.outputs.workspace == ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add success comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = 'Publish action cancelled: PR doesn't touch only 1 workspace';
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })       
+                
