@@ -31,7 +31,7 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-            const prBranch = pr.data.head.ref;
+            const prBranch = currentPullRequest.data.head.ref;
             core.setOutput('overlay-branch', prBranch);
             const matches = prBranch.match(/^workspaces\/release-.+__(.+)$/);
             if (matches && matches.length == 2) {
