@@ -36,6 +36,8 @@ jobs:
             const prCommit = currentPullRequest.data.head.sha;
             core.setOutput('overlay-commit', prCommit);
             let workspace = '';
+            console.log(currentPullRequest.data);
+
             const matches = prBranch.match(/^workspaces\/release-.+__(.+)$/);
             if (matches && matches.length == 2) {
               workspace = `workspaces/${matches[1]}`;
@@ -59,7 +61,9 @@ jobs:
               return;
             }
 
+            console.log("before getWorkflowRun");
             const workflowRun = await github.rest.actions.getWorkflowRun('${{ github.run_id }}');
+            console.log(workflowRun);
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
