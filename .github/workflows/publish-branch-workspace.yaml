@@ -62,7 +62,11 @@ jobs:
             }
 
             console.log("before getWorkflowRun");
-            const workflowRun = await github.rest.actions.getWorkflowRun('${{ github.run_id }}');
+            const workflowRun = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: '${{ github.run_id }}',
+            });
             console.log(workflowRun);
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
