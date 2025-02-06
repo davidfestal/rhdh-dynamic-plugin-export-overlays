@@ -125,7 +125,7 @@ jobs:
               run_id: '${{ github.run_id }}',
               filter: 'latest',
             });
-            console.log(workflowRun);
+            console.log(jobs);
 
             const exportJob = jobs.data.jobs.find(j => j.name === 'parent_export' );
 
