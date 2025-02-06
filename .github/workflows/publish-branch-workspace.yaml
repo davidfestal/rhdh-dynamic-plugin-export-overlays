@@ -140,7 +140,7 @@ jobs:
               description: '${{ github.workflow }}',
               state: success ? 'success' : 'failure',
               target_url: workflowRun.data.html_url,
-              context: 'Publish',
+              context: 'publish',
             });
 
             console.log("beforeBodySet");
