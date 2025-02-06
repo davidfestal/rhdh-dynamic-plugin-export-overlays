@@ -133,14 +133,14 @@ jobs:
               repo: context.repo.repo,
               sha: '${{ needs.prepare.outputs.overlay-commit }}',
               description: '${{ github.workflow }}',
-              state: job?.conclusion === 'success' ?
+              state: exportJob?.conclusion === 'success' ?
                 'success' : 'failure',
-              target_url: workflowRun.html_url
+              target_url: workflowRun.data.html_url
             });
 
             console.log("beforeBodySet");
 
-            let body = `Publish workflow has completed with status: ${ workflowRun.data.conclusion }.`;
+            let body = `Publish workflow has completed with status: ${ exportJob.conclusion }.`;
             if ('${{ needs.parent_export.outputs.published-exports }}' !== '') {
               body = `${body}\n- published container images:`;
               '${{ needs.parent_export.outputs.published-exports }}'.split('\n')
