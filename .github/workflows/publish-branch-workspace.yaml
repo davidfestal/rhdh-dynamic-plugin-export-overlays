@@ -126,17 +126,21 @@ jobs:
 
             console.log("beforeBodySet");
 
-            let body = `Publish workflow finished:
-            - published container images:
-            ${{ needs.parent_export.outputs.published-exports }}            
-            `;
-            if ('${{ needs.parent_export.outputs.failed-exports }}' !== '') {
-              body += `
-            - failed exports:
-            ${{ needs.parent_export.outputs.failed-exports }}            
-            `;
+            let body = `Publish workflow has completed with status: ${ workflowRun.data.conclusion }}.`
+            if ('${{ needs.parent_export.outputs.published-exports }}' !== '') {
+              body = `${body}\n- published container images:`;
+              '${{ needs.parent_export.outputs.published-exports }}'
+                .forEach(line => {
+                  body = `${body}\n  - ${line}`;
+                });
             }
-
+            if ('${{ needs.parent_export.outputs.published-exports }}' !== '') {
+              body = `${body}\n- published container images:`;
+              '${{ needs.parent_export.outputs.published-exports }}'
+                .forEach(line => {
+                  body = `${body}\n  - ${line}`;
+                });
+            }
             console.log(body);
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
