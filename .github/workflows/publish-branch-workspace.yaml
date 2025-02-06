@@ -126,16 +126,18 @@ jobs:
               filter: 'latest',
             });
             console.log(jobs.data.jobs.map(j => j.name));
+            console.log(jobs.data.jobs.map(j => j.conclusion));
 
-            const exportJob = jobs.data.jobs.find(j => j.name === 'parent_export' );
+            const success = jobs.data.jobs
+              .filter(j => j.name.startsWith('parent_export'))
+              .every(j => j.conclusion === 'success');
 
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: '${{ needs.prepare.outputs.overlay-commit }}',
               description: '${{ github.workflow }}: completed',
-              state: (exportJob?.conclusion ?? '') === 'success' ?
-                'success' : 'failure',
+              state: success ? 'success' : 'failure',
               target_url: workflowRun.data.html_url
             });
 
