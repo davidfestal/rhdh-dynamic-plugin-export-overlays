@@ -36,6 +36,7 @@ jobs:
               pull_number: context.issue.number
             });
             const prBranch = currentPullRequest.data.head.ref;
+            core.setOutput('overlay-branch', prBranch);
             const prCommit = currentPullRequest.data.head.sha;
             core.setOutput('overlay-commit', prCommit);
             let workspace = '';
