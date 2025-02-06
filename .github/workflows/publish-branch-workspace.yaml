@@ -175,6 +175,6 @@ jobs:
               body: body
             })       
 
-     pull-requests: write
+      pull-requests: write
 
         
