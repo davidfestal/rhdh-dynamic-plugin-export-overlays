@@ -75,7 +75,8 @@ jobs:
               sha: prCommit,
               description: '${{ github.workflow }}',
               state: 'pending',
-              target_url: workflowRun.data.html_url
+              target_url: workflowRun.data.html_url,
+              context: 'publish'
             });
             
   parent_export:
@@ -138,14 +139,15 @@ jobs:
               sha: '${{ needs.prepare.outputs.overlay-commit }}',
               description: '${{ github.workflow }}',
               state: success ? 'success' : 'failure',
-              target_url: workflowRun.data.html_url
+              target_url: workflowRun.data.html_url,
+              context: 'Publish',
             });
 
             console.log("beforeBodySet");
 
-            let body = `Publish workflow has completed with ${ success ? 'success' : 'failure' }.`;
+            let body = `Publish workflow has completed with ${ success ? 'success' : 'failure' }:`;
             if ('${{ needs.parent_export.outputs.published-exports }}' !== '') {
-              body = `${body}\n- published container images:`;
+              body = `${body}\n- published the following container images:`;
               '${{ needs.parent_export.outputs.published-exports }}'.split('\n')
                 .filter(line => line.trim() !== '')
                 .forEach(line => {
@@ -153,7 +155,7 @@ jobs:
                 });
             }
             if ('${{ needs.parent_export.outputs.failed-exports }}' !== '') {
-              body = `${body}\n- Export as dynamic failed on plugins:`;
+              body = `${body}\n- export and published failed on the following plugins:`;
               '${{ needs.parent_export.outputs.failed-exports }}'.split('\n')
                 .filter(line => line.trim() !== '')
                 .forEach(line => {
