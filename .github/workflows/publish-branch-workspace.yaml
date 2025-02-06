@@ -73,7 +73,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: prCommit,
-              description: workflowRun.data.display_title,
+              description: '${{ github.workflow }}',
               state: 'pending',
               target_url: workflowRun.html_url
             });
@@ -118,7 +118,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: ${{ needs.prepare.outputs.overlay-commit }},
-              description: workflowRun.data.display_title,
+              description: '${{ github.workflow }}',
               state: workflowRun.data.conclusion === 'success' ?
                 'success' : 'failure',
               target_url: workflowRun.html_url
