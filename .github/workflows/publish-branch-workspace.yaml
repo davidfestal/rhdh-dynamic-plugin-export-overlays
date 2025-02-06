@@ -73,9 +73,9 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: prCommit,
-              description: '${{ github.workflow }}',
+              description: '${{ github.workflow }}: started',
               state: 'pending',
-              target_url: workflowRun.html_url
+              target_url: workflowRun.data.html_url
             });
             
   parent_export:
@@ -125,7 +125,7 @@ jobs:
               run_id: '${{ github.run_id }}',
               filter: 'latest',
             });
-            console.log(jobs);
+            console.log(jobs.data.jobs.map(j => j.name));
 
             const exportJob = jobs.data.jobs.find(j => j.name === 'parent_export' );
 
@@ -133,7 +133,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: '${{ needs.prepare.outputs.overlay-commit }}',
-              description: '${{ github.workflow }}',
+              description: '${{ github.workflow }}: completed',
               state: (exportJob?.conclusion ?? '') === 'success' ?
                 'success' : 'failure',
               target_url: workflowRun.data.html_url
