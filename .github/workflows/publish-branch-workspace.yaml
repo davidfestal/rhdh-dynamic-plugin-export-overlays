@@ -108,7 +108,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Add success comment
+      - name: Add completion comment
         uses: actions/github-script@v7
         with:
           script: |
@@ -175,6 +175,7 @@ jobs:
               body: body
             })       
 
+    permissions:
       pull-requests: write
 
         
