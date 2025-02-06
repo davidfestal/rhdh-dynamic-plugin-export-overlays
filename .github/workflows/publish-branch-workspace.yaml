@@ -15,6 +15,7 @@ jobs:
     if: github.event.issue.pull_request
     outputs:
       overlay-branch: ${{ steps.get-branch.outputs.overlay-branch }}
+      overlay-commit: ${{ steps.get-branch.outputs.overlay-commit }}
       workspace: ${{ steps.get-branch.outputs.workspace }}
 
     steps:
@@ -32,28 +33,42 @@ jobs:
               pull_number: context.issue.number
             });
             const prBranch = currentPullRequest.data.head.ref;
-            core.setOutput('overlay-branch', prBranch);
+            const prCommit = currentPullRequest.data.head.sha;
+            core.setOutput('overlay-commit', prCommit);
+            let workspace = '';
             const matches = prBranch.match(/^workspaces\/release-.+__(.+)$/);
             if (matches && matches.length == 2) {
-              core.setOutput('workspace', `workspaces/${matches[1]}`);
+              workspace = `workspaces/${matches[1]}`;
+            } else {
+              const prFiles = await github.rest.pulls.listFiles({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number
+              });
+              const workspaces = [ ... new Set(prFiles.data
+                .map(f => f.filename.match(/^workspaces\/([^\/]+)\/.*/))
+                .filter(match => match)
+                .map(match => match[1])
+              )];
+              if (workspaces.length === 1) {
+                workspace =`workspaces/${workspaces[0]}`;
+              }
+            }
+            core.setOutput('workspace', workspace);
+            if (workspace === '') {
               return;
             }
-            const prFiles = await github.rest.pulls.listFiles({
+
+            const workflowRun = await github.rest.actions.getWorkflowRun('${{ github.run_id }}');
+            await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.issue.number
+              sha: prCommit,
+              description: workflowRun.data.display_title,
+              state: 'pending',
+              target_url: workflowRun.html_url
             });
-            const workspaces = [ ... new Set(prFiles.data
-              .map(f => f.filename.match(/^workspaces\/([^\/]+)\/.*/))
-              .filter(match => match)
-              .map(match => match[1])
-            )];
-            if (workspaces.length === 1) {
-              core.setOutput('workspace', `workspaces/${workspaces[0]}`);
-            } else {
-              core.setOutput('workspace', '');
-            }
-
+            
   parent_export:
     needs:
       - prepare
@@ -72,24 +87,37 @@ jobs:
       packages: write
       id-token: write
 
-  add_success_comment:
+  add_completion_comment:
     needs:
+      - prepare
       - parent_export
 
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Add success comment
         uses: actions/github-script@v7
         with:
           script: |
+            const workflowRun = await github.rest.actions.getWorkflowRun('${{ github.run_id }}');
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: ${{ needs.prepare.outputs.overlay-commit }},
+              description: workflowRun.data.display_title,
+              state: workflowRun.data.conclusion === 'success' ?
+                'success' : 'failure',
+              target_url: workflowRun.html_url
+            });
+
             let body = `Publish workflow finished:
             - published container images:
-            ${ JSON.parse('${{ needs.parent_export.outputs.published-exports }}').join('  \n') }            
+            ${{ needs.parent_export.outputs.published-exports }}            
             `;
-            if ('${{ needs.parent_export.outputs.published-exports }}' !== '[]') {
+            if ('${{ needs.parent_export.outputs.failed-exports }}' !== '') {
               body += `
             - failed exports:
-            ${ JSON.parse('${{ needs.parent_export.outputs.failed-exports }}').join('  \n') }            
+            ${{ needs.parent_export.outputs.failed-exports }}            
             `;
             }
 
