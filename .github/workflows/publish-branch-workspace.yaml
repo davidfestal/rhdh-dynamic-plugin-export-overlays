@@ -126,7 +126,8 @@ jobs:
 
             console.log("beforeBodySet");
 
-            let body = `Publish workflow has completed with status: ${ workflowRun.data.conclusion }}.`
+            let body = `Publish workflow has completed with status: ${ workflowRun.data.conclusion }}.`;
+            /*
             if ('${{ needs.parent_export.outputs.published-exports }}' !== '') {
               body = `${body}\n- published container images:`;
               '${{ needs.parent_export.outputs.published-exports }}'
@@ -141,6 +142,7 @@ jobs:
                   body = `${body}\n  - ${line}`;
                 });
             }
+            */
             console.log(body);
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
