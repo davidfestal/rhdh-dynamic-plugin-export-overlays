@@ -103,7 +103,8 @@ jobs:
 
     permissions:
       statuses: write
-    
+      pull-requests: write
+
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -155,9 +156,6 @@ jobs:
             })
             console.log("afterCommentCreated");
     
-    permissions:
-      pull-requests: write
-
   add_no_workspace_comment:
     needs:
       - prepare
@@ -177,7 +175,6 @@ jobs:
               body: body
             })       
 
-    permissions:
-      pull-requests: write
+     pull-requests: write
 
         
