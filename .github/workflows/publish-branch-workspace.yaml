@@ -7,9 +7,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.issue.id }}
   cancel-in-progress: true
 
-permissions:
-  statuses: write
-
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -20,6 +17,9 @@ jobs:
       overlay-branch: ${{ steps.get-branch.outputs.overlay-branch }}
       overlay-commit: ${{ steps.get-branch.outputs.overlay-commit }}
       workspace: ${{ steps.get-branch.outputs.workspace }}
+
+    permissions:
+      statuses: write
 
     steps:
       - name: Get PR branch data
@@ -101,6 +101,9 @@ jobs:
       - prepare
       - parent_export
 
+    permissions:
+      statuses: write
+    
     if: always()
     runs-on: ubuntu-latest
     steps:
