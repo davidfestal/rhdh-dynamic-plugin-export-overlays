@@ -125,6 +125,7 @@ jobs:
               run_id: '${{ github.run_id }}',
               filter: 'latest',
             });
+            console.log(workflowRun);
 
             const exportJob = jobs.data.jobs.find(j => j.name === 'parent_export' );
 
@@ -133,14 +134,14 @@ jobs:
               repo: context.repo.repo,
               sha: '${{ needs.prepare.outputs.overlay-commit }}',
               description: '${{ github.workflow }}',
-              state: exportJob?.conclusion === 'success' ?
+              state: (exportJob?.conclusion ?? '') === 'success' ?
                 'success' : 'failure',
               target_url: workflowRun.data.html_url
             });
 
             console.log("beforeBodySet");
 
-            let body = `Publish workflow has completed with status: ${ exportJob.conclusion }.`;
+            let body = `Publish workflow has completed with status: ${ exportJob?.conclusion ?? 'unknown' }.`;
             if ('${{ needs.parent_export.outputs.published-exports }}' !== '') {
               body = `${body}\n- published container images:`;
               '${{ needs.parent_export.outputs.published-exports }}'.split('\n')
