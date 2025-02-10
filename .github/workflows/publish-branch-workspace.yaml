@@ -104,7 +104,7 @@ jobs:
       statuses: write
       pull-requests: write
 
-    if: always()
+    if: always() && needs.prepare.outputs.overlay-branch != '' && needs.prepare.outputs.workspace != ''
     runs-on: ubuntu-latest
     steps:
       - name: Add completion comment
