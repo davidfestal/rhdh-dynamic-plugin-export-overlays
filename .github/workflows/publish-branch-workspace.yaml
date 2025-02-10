@@ -25,11 +25,9 @@ jobs:
       - name: Get PR branch data
         id: get-branch
         uses: actions/github-script@v7
+        if: ${{ github.event.comment.body == '/publish' }}
         with:
           script: |
-            if ('${{ github.event.comment.body }}' !== '/publish') {
-              return;
-            }
             const currentPullRequest = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -111,6 +109,10 @@ jobs:
     steps:
       - name: Add completion comment
         uses: actions/github-script@v7
+        env:
+          INPUT_OVERLAY_COMMIT: ${{ needs.prepare.outputs.overlay-commit }}
+          INPUT_PUBLISHED_EXPORTS: ${{ needs.parent_export.outputs.published-exports }}
+          INPUT_FAILED_EXPORTS: ${{ needs.parent_export.outputs.failed-exports }}
         with:
           script: |
             const workflowRun = await github.rest.actions.getWorkflowRun({
@@ -118,17 +120,12 @@ jobs:
               repo: context.repo.repo,
               run_id: '${{ github.run_id }}'
             });
-            console.log(workflowRun);
-
             const jobs = await github.rest.actions.listJobsForWorkflowRun({
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: '${{ github.run_id }}',
               filter: 'latest',
             });
-            console.log(jobs.data.jobs.map(j => j.name));
-            console.log(jobs.data.jobs.map(j => j.conclusion));
-
             const success = jobs.data.jobs
               .filter(j => j.name.startsWith('parent_export'))
               .every(j => j.conclusion === 'success');
@@ -136,40 +133,34 @@ jobs:
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: '${{ needs.prepare.outputs.overlay-commit }}',
+              sha: core.getInput('overlay_commit'),
               description: '${{ github.workflow }}',
               state: success ? 'success' : 'failure',
               target_url: workflowRun.data.html_url,
               context: 'publish',
             });
 
-            console.log("beforeBodySet");
-
             let body = `Publish workflow has completed with ${ success ? 'success' : 'failure' }:`;
-            if ('${{ needs.parent_export.outputs.published-exports }}' !== '') {
+            const publishedExports = core.getMultilineInput('published_exports');
+            if (publishedExports.length > 0) {
               body = `${body}\n- published the following container images:`;
-              '${{ needs.parent_export.outputs.published-exports }}'.split('\n')
-                .filter(line => line.trim() !== '')
-                .forEach(line => {
-                  body = `${body}\n  - ${line}`;
-                });
+              publishedExports.forEach(line => {
+                body = `${body}\n  - ${line}`;
+              });
             }
-            if ('${{ needs.parent_export.outputs.failed-exports }}' !== '') {
+            const failedExports = core.getMultilineInput('failed_exports');
+            if (failedExports.length > 0) {
               body = `${body}\n- export and published failed on the following plugins:`;
-              '${{ needs.parent_export.outputs.failed-exports }}'.split('\n')
-                .filter(line => line.trim() !== '')
-                .forEach(line => {
-                  body = `${body}\n  - ${line}`;
-                });
+              failedExports.forEach(line => {
+                body = `${body}\n  - ${line}`;
+              });
             }
-            console.log(body);
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: body
             })
-            console.log("afterCommentCreated");
     
   add_no_workspace_comment:
     needs:
