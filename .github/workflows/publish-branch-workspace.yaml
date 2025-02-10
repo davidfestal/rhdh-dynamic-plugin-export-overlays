@@ -140,10 +140,10 @@ jobs:
               context: 'publish',
             });
 
-            let body = `Publish workflow has completed with ${ success ? 'success' : 'failure' }:`;
+            let body = `Publish workflow has completed with ${ success ? 'success' : 'failure' }.`;
             const publishedExports = core.getMultilineInput('published_exports');
             if (publishedExports.length > 0) {
-              body = `${body}\n- published the following container images:`;
+              body = `${body}\n- Published the following container images:`;
               publishedExports.forEach(line => {
                 body = `${body}\n  - ${line}`;
               });
