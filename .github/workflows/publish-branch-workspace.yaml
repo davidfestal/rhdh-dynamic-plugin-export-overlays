@@ -142,14 +142,14 @@ jobs:
             let body = `Publish workflow has completed with ${ success ? 'success' : 'failure' }.`;
             const publishedExports = core.getMultilineInput('published_exports');
             if (publishedExports.length > 0) {
-              body = `${body}\n- Published the following container images:`;
+              body = `${body}\n- Published container images:`;
               publishedExports.forEach(line => {
                 body = `${body}\n  - ${line}`;
               });
             }
             const failedExports = core.getMultilineInput('failed_exports');
             if (failedExports.length > 0) {
-              body = `${body}\n- export and published failed on the following plugins:`;
+              body = `${body}\n- Plugins failed during export or container image publishing:`;
               failedExports.forEach(line => {
                 body = `${body}\n  - ${line}`;
               });
