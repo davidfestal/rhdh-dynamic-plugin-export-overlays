@@ -95,7 +95,7 @@ jobs:
     with:
       node-version: ${{ inputs.node-version }}
       janus-cli-version: ${{ inputs.janus-cli-version }}
-      upload-project-on-error: ${{ inputs.upload-project-on-error == 'true' }}
+      upload-project-on-error: ${{ inputs.upload-project-on-error }}
       overlay-branch: ${{ inputs.overlay-branch }}
       workspace-path: ${{ inputs.workspace-path }}
       publish-container: ${{ inputs.publish-container }}
