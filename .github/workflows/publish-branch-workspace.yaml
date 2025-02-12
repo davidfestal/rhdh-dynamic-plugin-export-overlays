@@ -1,4 +1,4 @@
-name: Publish PR Dynamic Plugins as Images 
+name: Publish as Dynamic Plugin Images for PR
 on:
   issue_comment:
     types: [created]
