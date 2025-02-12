@@ -1,6 +1,15 @@
 name: Export Workspace as Dynamic Plugins Packages
 on:
   workflow_call:
+    secrets:
+      image-registry-user:
+        description: User name to be used to push to container image registry
+        required: false
+
+      image-registry-password:
+        description: Password to be used to push to container image registry
+        required: false
+
     inputs:
       node-version:
         description: node-version to execute the export
@@ -33,6 +42,11 @@ on:
         description: Publish a container image for the dynamic plugins
         required: true
         type: boolean
+
+      image-repository-prefix:
+        description: Repository prefix of the dynamic plugin container images
+        type: string
+        required: false  
 
   workflow_dispatch:
     inputs:
@@ -84,6 +98,11 @@ jobs:
       overlay-branch: ${{ inputs.overlay-branch }}
       workspace-path: ${{ inputs.workspace-path }}
       publish-container: ${{ inputs.publish-container == 'true' }}
+      image-repository-prefix: ${{ inputs.image-repository-prefix }}
+      
+    secrets:
+      image-registry-user: ${{ secrets.image-registry-user }}
+      image-registry-password: ${{ secrets.image-registry-password }}
 
     permissions:
       contents: write
