@@ -4,7 +4,7 @@ on:
     types: [created]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.issue.id }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ github.event.issue.id }}
   cancel-in-progress: true
 
 jobs:
