@@ -98,7 +98,7 @@ jobs:
       upload-project-on-error: ${{ inputs.upload-project-on-error == 'true' }}
       overlay-branch: ${{ inputs.overlay-branch }}
       workspace-path: ${{ inputs.workspace-path }}
-      publish-container: ${{ inputs.publish-container == 'true' }}
+      publish-container: ${{ inputs.publish-container }}
       image-repository-prefix: ${{ inputs.image-repository-prefix }}
       
     secrets:
