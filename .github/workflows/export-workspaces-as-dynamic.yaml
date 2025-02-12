@@ -90,7 +90,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  parent_export:
+  export:
     uses: davidfestal/rhdh-plugin-export-utils/.github/workflows/export-workspaces-as-dynamic.yaml@multi-plugins-repo
     with:
       node-version: ${{ inputs.node-version }}
