@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   export:
-    uses: davidfestal/rhdh-dynamic-plugin-export-overlays/.github/workflows/export-workspaces-as-dynamic.yaml@main
+    uses: davidfestal/rhdh-plugin-export-utils/.github/workflows/export-workspaces-as-dynamic.yaml@multi-plugins-repo
     with:
       publish-container: true
       image-repository-prefix: ghcr.io/${{ github.repository }}
