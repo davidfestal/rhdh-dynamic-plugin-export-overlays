@@ -2,10 +2,6 @@ name: Publish RHDH Release Dynamic Plugin Images
 on:
   workflow_call:
 
-  push:
-    branches:
-      - 'release-**'
-
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
