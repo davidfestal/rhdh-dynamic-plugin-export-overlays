@@ -7,11 +7,56 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    name: Prepare
+
+    steps:
+      - name: Get last published commit
+        id: get-last-published-commit
+        uses: actions/github-script@v7
+        env:
+          INPUT_RELEASE_BRANCH: ${{ github.ref_name }}      
+        with:
+          script: |
+            core.info(`Getting latest commit on branch ${core.getInput('release_branch')}`);
+            const response = await githubClient.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: core.getInput('release_branch'),
+              per_page: 1,
+            });
+            for (const commit of response.data) {
+              const checksResult = octokit.rest.checks.listForRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: commit.sha,
+              });
+              if (checksResult.total_count === 0) {
+                break;
+              }
+              const checks = checksResult.data.check_runs.filter(c => c.name.startsWith('export /'));
+              console.log(checks);
+              if (checks.length == 0){
+                continue;
+              }
+              if (checks.every(c => c.status === 'completed' && c.conlusion === 'success')) {
+                core.setOutput('last-published-commit', commit.sha);
+                return; 
+              }
+            }
+            core.setOutput('last-published-commit', '');
+            
   export:
     uses: davidfestal/rhdh-plugin-export-utils/.github/workflows/export-workspaces-as-dynamic.yaml@multi-plugins-repo
+    needs:
+      - prepare
+
     with:
       publish-container: true
       image-repository-prefix: ghcr.io/${{ github.repository }}
+      last-publish-commit: ${{ needs.prepare.outputs.last-published-commit }}
+
     permissions:
       contents: write
       attestations: write
