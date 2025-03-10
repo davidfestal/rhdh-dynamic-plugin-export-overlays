@@ -20,14 +20,14 @@ jobs:
         with:
           script: |
             core.info(`Getting latest commit on branch ${core.getInput('release_branch')}`);
-            const response = await githubClient.repos.listCommits({
+            const response = await github.rest.repos.listCommits({
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: core.getInput('release_branch'),
               per_page: 1,
             });
             for (const commit of response.data) {
-              const checksResult = octokit.rest.checks.listForRef({
+              const checksResult = github.rest.checks.listForRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 ref: commit.sha,
