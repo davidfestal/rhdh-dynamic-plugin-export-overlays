@@ -32,6 +32,7 @@ jobs:
                 repo: context.repo.repo,
                 ref: commit.sha,
               });
+              console.log(checksResult);
               if (checksResult.total_count === 0) {
                 break;
               }
