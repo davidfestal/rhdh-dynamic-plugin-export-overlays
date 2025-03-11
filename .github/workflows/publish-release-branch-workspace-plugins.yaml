@@ -45,7 +45,7 @@ jobs:
               if (checks.length == 0){
                 continue;
               }
-              if (checks.every(c => c.status === 'completed' && c.conlusion === 'success')) {
+              if (checks.every(c => c.status === 'completed' && c.conclusion === 'success')) {
                 core.setOutput('last-published-commit', commit.sha);
                 return; 
               }
