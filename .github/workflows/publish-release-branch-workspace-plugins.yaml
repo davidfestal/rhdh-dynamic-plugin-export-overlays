@@ -10,6 +10,8 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     name: Prepare
+    outputs:
+      last-published-commit: ${{ steps.get-last-published-commit.outputs.last-published-commit }}
 
     steps:
       - name: Get last published commit
@@ -36,20 +38,20 @@ jobs:
                 repo: context.repo.repo,
                 ref: commit.sha,
               });
-              console.log(checksResult);
               if (checksResult.data.total_count === 0) {
                 break;
               }
               const checks = checksResult.data.check_runs.filter(c => c.name.startsWith('export /'));
-              console.log(checks);
               if (checks.length == 0){
                 continue;
               }
               if (checks.every(c => c.status === 'completed' && c.conclusion === 'success')) {
+                core.info(`Last published commit to compare with: ${commit.sha}`);
                 core.setOutput('last-published-commit', commit.sha);
-                return; 
+                return;
               }
             }
+            core.info(`Last published commit not found`);
             core.setOutput('last-published-commit', '');
             
   export:
