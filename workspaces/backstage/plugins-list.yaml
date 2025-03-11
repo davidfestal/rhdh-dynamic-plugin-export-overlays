@@ -75,4 +75,3 @@ plugins/signals-backend:
 plugins/techdocs:
 plugins/techdocs-backend: --embed-package @backstage/plugin-search-backend-module-techdocs --suppress-native-package cpu-features
 plugins/techdocs-module-addons-contrib:
-
