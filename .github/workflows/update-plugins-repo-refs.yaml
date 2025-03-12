@@ -15,8 +15,8 @@ on:
         required: false
         default: false
   
-#  schedule:
-#    - cron: '0 12 * * *'    
+  schedule:
+    - cron: '0 12 * * *'
 
 concurrency:
   group: ${{ github.workflow }}
