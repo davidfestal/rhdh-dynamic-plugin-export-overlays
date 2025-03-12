@@ -47,8 +47,13 @@ on:
       image-repository-prefix:
         description: Repository prefix of the dynamic plugin container images
         type: string
-        required: false  
+        required: false
 
+      last-publish-commit:
+        description: Optional commit ID of the last successful publishing of plugin container images
+        type: string
+        required: false
+  
   workflow_dispatch:
     inputs:
       node-version:
@@ -85,6 +90,16 @@ on:
         type: boolean
         default: false   
 
+      image-repository-prefix:
+        description: Repository prefix of the dynamic plugin container images
+        type: string
+        required: false
+  
+      last-publish-commit:
+        description: Optional commit ID of the last successful publishing of plugin container images
+        type: string
+        required: false
+  
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
